@@ -60,8 +60,8 @@ modelo.enviarEmail = function(email,token,callback){
         port: 465,
         secure: true,
         auth: {
-            user: 'spekgabrimp@gmail.com',
-            pass: 'xpha mhun dcvc ydpo'
+            user: 'spek****@gmail.com',
+            pass: '**** **** **** ****'
         }
     });
 
