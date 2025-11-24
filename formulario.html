@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Moderno</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #1e1f26;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #e0e0e0;
+    }
+
+    .container {
+      background: #2c2f36;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 400px;
+      transition: all 0.3s ease;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #e0e0e0;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #3a3d45;
+      color: #e0e0e0;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #007b9e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #005f7a;
+    }
+
+    .message {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #00bcd4;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginContainer">
+    <h2>Iniciar sesión</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Correo electrónico" required />
+      <input type="password" id="password" placeholder="Contraseña" required />
+      <button type="submit">Ingresar</button>
+    </form>
+    <div class="message" id="message" style="display: none;"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const loginResponse = await fetch('http://localhost:3000/verificar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: email, 
+            pass: password 
+            })
+        });
+
+        const loginData = await loginResponse.json();
+
+        if (loginResponse.ok && loginData.token) {
+          form.style.display = 'none';
+          messageDiv.textContent = 'Hemos enviado el link de verificación a tu correo';
+          messageDiv.style.display = 'block';
+
+          await fetch('http://localhost:3000/enviarEmail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, token: loginData.token })
+          });
+        } else {
+          alert('Credenciales incorrectas o error en el servidor.');
+        }
+      } catch (error) {
+        console.error('Error en el login:', error);
+        alert('Hubo un problema al conectar con el servidor.');
+      }
+    });
+  </script>
+</body>
+</html>
